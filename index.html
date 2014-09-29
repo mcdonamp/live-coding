@@ -23,56 +23,17 @@
 		<script type="text/javascript">
 		$(function() {
 			//STEP 1: Define Firebase references and create user
-			var ref = new Firebase("https://chicago.firebaseio.com/");
-			var usersRef = ref.child("users");
-			var messagesRef = ref.child("messages");
-			var currentUser = null;
 
 			//STEP 2: Log user in when login button is clicked
-			$('#login').on("click", function () {
-				console.log('logging in');
-				auth.login('twitter');
-			});
 
 			//STEP 3: Login with Twitter
-			var auth = new FirebaseSimpleLogin(ref, function (error, user) {
-				if (error) {
-					console.log(error);
-				} else if (user) {
-					usersRef.child(user.uid).set({username: user.username, pic: user.thirdPartyUserData.profile_image_url});
-					currentUser = user;
-				} else {
-					//user is logged out
-				}
-			});
-
 
 			//STEP 4: Display a list of users who have logged in
-			usersRef.on("child_added", function (snapshot) {
-				var user = snapshot.val();
-				$("<div id='user'><img src=" + user.pic + "/><span id='username'>@" + user.username + "</span></div>").appendTo($('#here'));
-			});
-
 
 			//STEP 5: Store messages in Firebase
-			$('#tweet-submit').on('click', function () {
-				if (currentUser !== null) {
-					var message = $('#msgInput').val();
-
-					//Send the message to Firebase
-					messagesRef.push({user: currentUser.uid, username: currentUser.username, message: message});
-					$('#msgInput').val('');
-				} else {
-					alert('You must login with Twitter to post!');
-				}
-			});
-
 
 			//STEP 6: Add messages to DOM in realtime
-			messagesRef.on("child_added", function (snapshot) {
-				var message = snapshot.val();
-				$('#stream').append($("<div class='msg-text'>").text(message.username).append('<br/>').append($('<span/>').text(message.message)));
-			});
+
 		});
 		</script>
 	</body>
