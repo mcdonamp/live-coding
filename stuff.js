@@ -24,16 +24,22 @@ var auth = new FirebaseSimpleLogin(ref, function (error, user) {
 });
 
 //STEP 4
-	var user = snapshot.val();
-	$("<div id='user'><img src=" + user.pic + "/><span id='username'>@" + user.username + "</span></div>").appendTo($('#here'));
+	usersRef.on("child_added", function (snapshot) {
+		var user = snapshot.val();
+		$("<div id='user'><img src=" + user.pic + "/><span id='username'>@" + user.username + "</span></div>").appendTo($('#here'));
+
+	});
 
 //STEP 5
 	$('#tweet-submit').on('click', function () {
-		if (currentUser != null) {
+		if (currentUser !== null) {
+			//Pull message value
 			var message = $('#msgInput').val();
 
 			//Send the message to Firebase
+			messageRef.push({message: message, username: currentUser.username, user: currentUser.uid});
 
+			//Reset text input
 			$('#msgInput').val('');
 		} else {
 			alert('You must login with Twitter to post!');
@@ -41,9 +47,9 @@ var auth = new FirebaseSimpleLogin(ref, function (error, user) {
 	});
 
 
-messageRef.push({message: message, username: currentUser.username, user: currentUser.uid});
 
 //STEP 6
-	var message = snapshot.val();
-	$("<div class='msg-text'>@" + message.username + "<br/>" + message.message + "</div>").appendTo($('#stream'));
-
+	messagesRef.on("child_added", function (snapshot) {
+		var message = snapshot.val();
+		$('#stream').append($("<div class='msg-text'>").text(message.username).append('<br/>').append($('<span/>').text(message.message)));
+	});
